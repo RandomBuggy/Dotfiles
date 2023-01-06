@@ -1,0 +1,10 @@
+#syntax "command inside quotation"
+#syntax <tab> {{key-bindings}} [note:- for xkeybinds Mod4 = for sxhkd's super]
+
+# in sxhkd, you can put $SHELL variables, add multiple keys at same line inside {}, has key-release events(just add 'release' as prefix
+
+
+
+#example
+super + t
+    "$TERMINAL Return" [note: Return == the carriage return key]

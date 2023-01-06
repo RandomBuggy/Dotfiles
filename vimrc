@@ -1,11 +1,5 @@
-"call plug#begin(~/.vim/plugged/)
-    "plug 'scrooloose/syntastic'
-    "plug 'scrooloose/nerdtree'
-    "plug 'flazz/vim-colorschemes'
-    "plug 'ervandew/supertab'
+let mapleader=" " " changing the leader key to {{space}}
 
-"call plug#end()
-"packloadall
 set nocompatible
 set number
 set relativenumber
@@ -21,10 +15,100 @@ set shiftwidth=4
 set expandtab
 set signcolumn=yes
 set scrolloff=8
-set spell
 set showmatch
 set matchpairs+=<:> "Use % to jump between pairs
 set encoding=utf-8
+
+" split always open at bottom+right
+set splitbelow splitright
+" Enable autocompletion:
+set wildmode=longest,list,full
+" Disables automatic commenting on newline:
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+" Perform dot commands over visual blocks:
+vnoremap . :normal .<CR>
+" Shortcutting split navigation, saving a keypress:
+map <C-h> <C-w>h
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+" Replace ex mode with gq
+map Q gq
+" Turns off highlighting on the bits of code that are changed, so the line that is changed is highlighted but the actual text that has changed stands out on the line and is readable.
+if &diff
+    highlight! link DiffText MatchParen
+endif
+
+" Some servers have issues with backup files, see #649
+set nobackup
+set nowritebackup
+
+set updatetime=300
+
+" Use tab for trigger completion with characters ahead and navigate
+" NOTE: There's always complete item selected by default, you may want to enable
+" no select by `"suggest.noselect": true` in your configuration file
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
+
+" Make <CR> to accept selected completion item or notify coc.nvim to format
+" <C-g>u breaks current undo, please make your own choice
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call ShowDocumentation()<CR>
+
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming
+nmap <leader>rn <Plug>(coc-rename)
+
+" Add `:Format` command to format current buffer
+command! -nargs=0 Format :call CocActionAsync('format')
+
+" Add `:Fold` command to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" Add `:OR` command for organize imports of the current buffer
+command! -nargs=0 OR   :call     CocActionAsync('runCommand', 'editor.action.organizeImport')
+
+" Add (Neo)Vim's native statusline support
+" NOTE: Please see `:h coc-status` for integrations with external plugins that
+" provide custom statusline: lightline.vim, vim-airline
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+" use <tab> to trigger completion and navigate to the next complete item
+function! CheckBackspace() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <Tab>
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
+      \ coc#refresh()
+autocmd FileType json syntax match Comment +\/\/.\+$+
 " Use a line cursor within insert mode and a block cursor everywhere else.
 "
 " Reference chart of values:
@@ -37,72 +121,3 @@ set encoding=utf-8
 "   Ps = 6  -> steady bar (xterm).
 let &t_SI = "\e[5 q"
 let &t_EI = "\e[2 q"
-:map <C-v> :NERDTree
-"syntastic configuration 
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-autocmd BufNewFile *.c 0r ~/.vim/templates/skel.c
-autocmd BufWinEnter *.c call cursor(5, 5)
-autocmd BufNewFile *.cpp 0r ~/.vim/templates/skel.cpp
-autocmd BufWinEnter *.cpp call cursor(6, 5)
-autocmd BufNewFile *.html 0r ~/.vim/templates/skel.html
-autocmd BufWinEnter *.html call cursor(7, 16)
-autocmd BufNewFile *.java 0r ~/.vim/templates/skel.java
-autocmd BufWinEnter *.java call cursor(1, 14)
-autocmd BufNewFile *.asm 0r ~/.vim/templates/skel.asm
-autocmd BufWinEnter *.asm call cursor(1, 3)
-set clipboard=unnamed
-nnoremap <leader>n :NERDTreeFocus<CR>
-nnoremap <C-n> :NERDTree<CR>
-nnoremap <C-t> :NERDTreeToggle<CR>
-nnoremap <C-f> :NERDTreeFind<CR>
-
-" filenames like *.xml, *.html, *.xhtml, ...
-" These are the file extensions where this plugin is enabled.
-"
-let g:closetag_filenames = '*.html,*.xhtml,*.phtml'
-
-" filenames like *.xml, *.xhtml, ...
-" This will make the list of non-closing tags self-closing in the specified files.
-"
-let g:closetag_xhtml_filenames = '*.xhtml,*.jsx'
-
-" filetypes like xml, html, xhtml, ...
-" These are the file types where this plugin is enabled.
-"
-let g:closetag_filetypes = 'html,xhtml,phtml'
-
-" filetypes like xml, xhtml, ...
-" This will make the list of non-closing tags self-closing in the specified files.
-"
-let g:closetag_xhtml_filetypes = 'xhtml,jsx'
-
-" integer value [0|1]
-" This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
-"
-let g:closetag_emptyTags_caseSensitive = 1
-
-" dict
-" Disables auto-close if not in a "valid" region (based on filetype)
-"
-let g:closetag_regions = {
-    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
-    \ 'javascript.jsx': 'jsxRegion',
-    \ 'typescriptreact': 'jsxRegion,tsxRegion',
-    \ 'javascriptreact': 'jsxRegion',
-    \ }
-
-" Shortcut for closing tags, default is '>'
-"
-let g:closetag_shortcut = '>'
-
-" Add > at current position without closing the current tag, default is ''
-"
-let g:closetag_close_shortcut = '<leader>>'
-let g:indentLine_char_list = ['|', '¦', '┆', '┊']
